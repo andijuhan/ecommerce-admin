@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/command';
 
 type PopoverTriggerProps = React.ComponentPropsWithRef<typeof PopoverTrigger>;
+//React.ComponentPropsWithRef adalah tipe bawaan dalam React yang digunakan untuk mendapatkan tipe properti dari sebuah komponen.
 
 interface StoreSwitcherProps extends PopoverTriggerProps {
    items: Store[];
