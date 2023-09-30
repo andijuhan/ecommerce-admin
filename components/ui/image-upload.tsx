@@ -33,8 +33,6 @@ const ImageUpload = ({
       return null;
    }
 
-   console.log(value);
-
    return (
       <div>
          <div className='mb-4 flex items-center gap-4'>

@@ -1,7 +1,6 @@
 'use client';
 
 import { AlertModal } from '@/components/modals/alert-modal';
-import ApiAlert from '@/components/ui/api-alert';
 import { Button } from '@/components/ui/button';
 import {
    Form,
@@ -15,7 +14,6 @@ import Heading from '@/components/ui/heading';
 import ImageUpload from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import useOrigin from '@/hooks/use-origin';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Billboard } from '@prisma/client';
 import axios from 'axios';
@@ -42,7 +40,6 @@ const BillboardForm = ({ initialData }: BillboardFormProps) => {
    const [loading, setLoading] = useState(false);
    const params = useParams();
    const router = useRouter();
-   const origin = useOrigin();
 
    const title = initialData ? 'Edit billboard' : 'Create billboard';
    const description = initialData
@@ -64,25 +61,39 @@ const BillboardForm = ({ initialData }: BillboardFormProps) => {
    const onSubmit = async (data: BillboardFormValue) => {
       try {
          setLoading(true);
-         await axios.patch(`/api/stores/${params.storeId}`, data);
+         if (initialData) {
+            await axios.patch(
+               `/api/${params.storeId}/billboards/${params.billboardId}`,
+               data
+            );
+         } else {
+            await axios.post(`/api/${params.storeId}/billboards`, data);
+         }
+
          router.refresh();
-         toast.success('Store updated.');
+         router.push(`/${params.storeId}/billboards`);
+         toast.success(toastMessage);
       } catch (error) {
          toast.error('Something went wrong.');
       } finally {
          setLoading(false);
+         setOpen(false);
       }
    };
 
    const onDelete = async () => {
       try {
          setLoading(true);
-         await axios.delete(`/api/stores/${params.storeId}`);
+         await axios.delete(
+            `/api/${params.storeId}/billboards/${params.billboardId}`
+         );
          router.refresh();
-         router.push('/');
-         toast.success('Store deleted.');
+         router.push(`/${params.storeId}/billboard`);
+         toast.success('Billboard deleted.');
       } catch (error) {
-         toast.error('Make sure you remove all products and categories first.');
+         toast.error(
+            'Make sure you remove all categories using this billboard first..'
+         );
       } finally {
          setLoading(false);
       }
@@ -157,11 +168,6 @@ const BillboardForm = ({ initialData }: BillboardFormProps) => {
                </Button>
             </form>
             <Separator />
-            <ApiAlert
-               title='NEXT_PUBLIC_API_URL'
-               description={`${origin}/api/${params.storeId}`}
-               varian='public'
-            />
          </Form>
       </>
    );
